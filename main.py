@@ -11,7 +11,7 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://127.0.0.1:8080"],  # You can limit to ["http://127.0.0.1:8080"]
+    allow_origins=["https://library-system-frontend-bice.vercel.app/"],  # You can limit to ["http://127.0.0.1:8080"]
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
