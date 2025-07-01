@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Smart Library System</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 40px;
+      background-color: #f4f4f4;
+    }
+    .container {
+      max-width: 800px;
+      margin: auto;
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h2 {
+      margin-top: 40px;
+    }
+    input, button, textarea {
+      width: 100%;
+      padding: 12px;
+      margin-top: 10px;
+      margin-bottom: 20px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    button {
+      background-color: #186bc3;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    .result {
+      white-space: pre-wrap;
+      background-color: #eef;
+      padding: 10px;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>📚 Smart Library System</h1>
+
+    <!-- Root -->
+    <button onclick="callAPI('GET', '/', null, 'rootOutput')">Check Backend Status</button>
+    <div id="rootOutput" class="result"></div>
+
+    <!-- Book APIs -->
+    <h2>📘 Books</h2>
+
+    <!-- Get All Books -->
+    <button onclick="callAPI('GET', '/books/', null, 'booksOutput')">Get All Books</button>
+
+    <!-- Create Book -->
+    <h3>Create Book</h3>
+    <textarea id="createBook" placeholder='{"title":"Book Name", "author":"Author", "description":"Optional"}'></textarea>
+    <button onclick="callAPI('POST', '/books/', getValue('createBook'), 'booksOutput')">Create Book</button>
+
+    <!-- Update Book -->
+    <h3>Update Book</h3>
+    <label for="updateBookId">Book ID to Update:</label>
+    <input id="updateBookId" placeholder="Enter Book ID to Update" />
+    <textarea id="updateBook" placeholder='{"title":"Updated Title", "author":"New Author", "description":"Updated Description"}'></textarea>
+    <button onclick="callAPI('PUT', '/books/' + getValue('updateBookId'), getValue('updateBook'), 'booksOutput')">Update Book</button>
+
+    <!-- Delete Book -->
+    <h3>Delete Book</h3>
+    <label for="deleteBookId">Book ID to Delete:</label>
+    <input id="deleteBookId" placeholder="Enter Book ID to Delete" />
+    <button onclick="callAPI('DELETE', '/books/' + getValue('deleteBookId'), null, 'booksOutput')">Delete Book</button>
+
+    <!-- Output -->
+    <div id="booksOutput" class="result"></div>
+
+    <!-- User APIs -->
+    <h2>Users</h2>
+    <button onclick="callAPI('GET', '/users/', null, 'usersOutput')">Get All Users</button>
+    <textarea id="createUser" placeholder='{"name":"User Name", "email":"user@example.com"}'></textarea>
+    <button onclick="callAPI('POST', '/users/', getValue('createUser'), 'usersOutput')">Create User</button>
+    <div id="usersOutput" class="result"></div>
+
+    <!-- Borrow API -->
+    <h2>Borrow Book</h2>
+    <textarea id="borrowData" placeholder='{"user_id":1, "book_id":2, "borrow_date":"2025-06-27"}'></textarea>
+    <button onclick="callAPI('POST', '/borrow/', getValue('borrowData'), 'borrowOutput')">Borrow Book</button>
+    <div id="borrowOutput" class="result"></div>
+
+    <!-- Recommendation API -->
+    <h2>Book Recommendation</h2>
+    <input type="text" id="preference" placeholder="Enter your book preference" />
+    <button onclick="callAPI('POST', '/recommendations/', JSON.stringify({ preference: getValue('preference') }), 'recommendOutput')">Get Recommendations</button>
+    <div id="recommendOutput" class="result"></div>
+  </div>
+
+  <script>
+    const BASE_URL = "http://127.0.0.1:8002";
+
+    function getValue(id) {
+      return document.getElementById(id).value;
+    }
+
+    async function callAPI(method, endpoint, data = null, outputId) {
+      const output = document.getElementById(outputId);
+      output.textContent = "Loading...";
+      try {
+        const res = await fetch(BASE_URL + endpoint, {
+          method: method,
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: data && method !== "GET" && method !== "DELETE" ? data : null
+        });
+
+        const contentType = res.headers.get("content-type");
+        const result = contentType && contentType.includes("application/json")
+          ? await res.json()
+          : await res.text();
+
+        output.textContent = JSON.stringify(result, null, 2);
+      } catch (err) {
+        output.textContent = "❌ Error: " + err.message;
+      }
+    }
+  </script>
+</body>
+</html>
