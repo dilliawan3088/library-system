@@ -7,15 +7,20 @@ from fastapi.middleware.cors import CORSMiddleware
 
 
 
-app = FastAPI()
+from fastapi.middleware.cors import CORSMiddleware
+
+origins = [
+    "https://library-system-frontend-bice.vercel.app",  # ✅ no trailing slash
+]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://library-system-frontend-bice.vercel.app/"],  # You can limit to ["http://127.0.0.1:8080"]
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 # Include routers for different functionalities
 app.include_router(books.router)
